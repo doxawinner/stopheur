@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+    <script>
+        // stopwatch.js
+
+/**
+ * A simple JavaScript Stopwatch with UI.
+ *
+ * Features:
+ * - Start, Stop, and Reset functionality.
+ * - Event-based timer updates.
+ */
+
+class Stopwatch {
+  constructor() {
+    this.startTime = null; // Tracks when the stopwatch started.
+    this.elapsedTime = 0;  // Accumulated elapsed time in milliseconds.
+    this.isRunning = false;
+    this.interval = null;  // Interval for updating listeners.
+
+    // Listener for time updates.
+    this.onUpdate = () => {};
+  }
+
+  /**
+   * Start the stopwatch.
+   */
+  start() {
+    if (this.isRunning) return;
+    this.isRunning = true;
+    this.startTime = Date.now() - this.elapsedTime;
+
+    this.interval = setInterval(() => {
+      this.elapsedTime = Date.now() - this.startTime;
+      this.onUpdate(this.getFormattedTime());
+    }, 100);
+  }
+
+  /**
+   * Stop the stopwatch.
+   */
+  stop() {
+    if (!this.isRunning) return;
+    this.isRunning = false;
+    clearInterval(this.interval);
+  }
+
+  /**
+   * Reset the stopwatch.
+   */
+  reset() {
+    this.stop();
+    this.elapsedTime = 0;
+    this.onUpdate(this.getFormattedTime());
+  }
+
+  /**
+   * Get the formatted elapsed time.
+   * @returns {string} - Time in the format MM:SS.mmm.
+   */
+  getFormattedTime() {
+    const minutes = Math.floor(this.elapsedTime / 60000);
+    const seconds = Math.floor((this.elapsedTime % 60000) / 1000);
+    const milliseconds = this.elapsedTime % 1000;
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${milliseconds.toString().padStart(3, '0')}`;
+  }
+
+  /**
+   * Set a callback function for time updates.
+   * @param {function} callback - Function to receive the formatted time.
+   */
+  setUpdateListener(callback) {
+    this.onUpdate = callback;
+  }
+}
+
+// UI Implementation
+
+// Create UI elements
+document.body.innerHTML = `
+  <div style="font-family: Arial, sans-serif; text-align: center; margin-top: 50px;">
+    <h1>Stopwatch</h1>
+    <div id="display" style="font-size: 2rem; margin-bottom: 20px;">00:00.000</div>
+    <button id="startButton" style="padding: 10px 20px; margin: 5px;">Start</button>
+    <button id="stopButton" style="padding: 10px 20px; margin: 5px;">Stop</button>
+    <button id="resetButton" style="padding: 10px 20px; margin: 5px;">Reset</button>
+  </div>
+`;
+
+// Initialize Stopwatch instance
+const stopwatch = new Stopwatch();
+const display = document.getElementById('display');
+
+// Update display on time updates
+stopwatch.setUpdateListener((time) => {
+  display.textContent = time;
+});
+
+// Attach event listeners to buttons
+document.getElementById('startButton').addEventListener('click', () => stopwatch.start());
+document.getElementById('stopButton').addEventListener('click', () => stopwatch.stop());
+document.getElementById('resetButton').addEventListener('click', () => stopwatch.reset());
+
+module.exports = Stopwatch;
+
+    </script>
+</body>
+</html>
